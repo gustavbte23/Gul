@@ -1,5 +1,4 @@
 let colorDisplay = null;
-let spinning = false;
 
 export function showColor(color) {
     hideColor();
@@ -28,83 +27,87 @@ export function startSpinningReels(num1, num2, num3) {
     const targets = [num1, num2, num3];
 
     reels.forEach((reel, index) => {
-        const resultId = targets[index];
-        const originalImages = Array.from(reel.querySelectorAll("img"));
-        const imageHeight = originalImages[0].clientHeight;
+        let wrapper = reel.querySelector('.reelWrapper');
+        const targetId = String(targets[index]);
 
-        // Create long reel for looping
-        reel.innerHTML = '';
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'relative';
-        wrapper.style.top = '0px';
+        if (!wrapper) {
+            const images = Array.from(reel.querySelectorAll("img"));
+            wrapper = document.createElement('div');
+            wrapper.className = 'reelWrapper';
+            wrapper.style.position = 'relative';
+            wrapper.style.top = '0px';
+            wrapper.style.transition = 'none';
+
+            for (let i = 0; i < 4; i++) {
+                images.forEach(img => {
+                    const clone = img.cloneNode(true);
+                    wrapper.appendChild(clone);
+                });
+            }
+
+            reel.innerHTML = '';
+            reel.appendChild(wrapper);
+        }
+
         wrapper.style.transition = 'none';
+        wrapper.style.top = '0px';
 
-        // Duplicate 4 times to allow wraparound
-        const duplicates = [...originalImages, ...originalImages, ...originalImages, ...originalImages];
-        duplicates.forEach(img => wrapper.appendChild(img.cloneNode(true)));
-        reel.appendChild(wrapper);
+        const allImages = Array.from(wrapper.querySelectorAll("img"));
+        const imageHeight = allImages[0].clientHeight || 100;
+        const loopHeight = allImages.length * imageHeight;
 
         let offset = 0;
-        const loopHeight = originalImages.length * imageHeight;
-        let speed = 24; // pixels/frame
+        const speed = 24;
         const spinStart = performance.now();
+
+        let animationFrame;
 
         function spinStep(timestamp) {
             const elapsed = timestamp - spinStart;
-
             offset += speed;
-            if (offset >= loopHeight * 2) {
-                offset -= loopHeight;
-            }
+            if (offset >= loopHeight * 2) offset -= loopHeight;
 
             wrapper.style.transition = 'none';
             wrapper.style.top = `-${offset}px`;
 
             if (elapsed < 5000) {
-                requestAnimationFrame(spinStep);
+                animationFrame = requestAnimationFrame(spinStep);
             } else {
                 slowToResult(offset);
             }
         }
 
         function slowToResult(currentOffset) {
-            const finalImages = Array.from(wrapper.querySelectorAll("img"));
-            const totalImages = finalImages.length;
+            const visibleImages = Array.from(wrapper.querySelectorAll("img"));
+            const total = visibleImages.length;
 
-            // Find the FIRST image with matching ID AFTER the current scroll offset
-            let indexOffset = Math.floor(currentOffset / imageHeight);
+            let currentIndex = Math.floor(currentOffset / imageHeight);
             let targetIndex = -1;
 
-            for (let i = indexOffset + 1; i < totalImages; i++) {
-                if (finalImages[i].id === String(resultId)) {
+            for (let i = currentIndex + 1; i < total; i++) {
+                if (visibleImages[i].id === targetId) {
                     targetIndex = i;
                     break;
                 }
             }
 
-            // If not found, fallback to the first matching one ahead of the current
             if (targetIndex === -1) {
-                for (let i = 0; i < totalImages; i++) {
-                    if (finalImages[i].id === String(resultId)) {
+                for (let i = 0; i < total; i++) {
+                    if (visibleImages[i].id === targetId) {
                         targetIndex = i;
                         break;
                     }
                 }
             }
 
-            if (targetIndex === -1) {
-                console.error(`No matching image with id=${resultId} found`);
-                return;
-            }
-
             const targetOffset = targetIndex * imageHeight;
-
-            // Animate to target smoothly using same base speed
             const distance = targetOffset - currentOffset;
-            const duration = Math.min(Math.max(1000, (distance / speed) * 16), 3000); // Clamp between 1–3s
+            const duration = Math.min(Math.max(1000, (distance / speed) * 16), 3000);
 
             wrapper.style.transition = `top ${duration}ms ease-out`;
             wrapper.style.top = `-${targetOffset}px`;
+
+            cancelAnimationFrame(animationFrame);
         }
 
         requestAnimationFrame(spinStep);

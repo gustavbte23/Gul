@@ -1,4 +1,4 @@
-import { getBank, updateBank, canAfford, renderBank } from './bank.js'; 
+import { getBank, updateBank, canAfford, renderBank } from './bank.js';
 import { showColor, hideColor, startSpinningReels } from './visionary.js';
 
 class PrivatePureLoveTrain {
@@ -42,7 +42,7 @@ class PrivatePureLoveTrain {
                 break;
             case 4:
                 this.jackpot = 1;
-                step=1;
+                step = 1;
                 console.log("Rainbow");
                 break;
         }
@@ -93,6 +93,11 @@ let cost = 0;
 let step = 0;
 let canPress = true;
 
+function cleanUpDelImages() {
+    const oldImages = document.querySelectorAll('.del');
+    oldImages.forEach(img => img.remove());
+}
+
 document.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         if (!canPress) {
@@ -103,7 +108,6 @@ document.addEventListener("keydown", (event) => {
         handleStep();
     }
 });
-
 
 function handleStep() {
     switch (step) {
@@ -127,6 +131,7 @@ function handleStep() {
             break;
 
         case 1:
+            cleanUpDelImages(); // Clean up reel images before spinning
             hideColor();
             game.doSpin();
             startSpinningReels(game.num1, game.num2, game.num3);
@@ -148,6 +153,7 @@ function handleStep() {
             break;
 
         case 2:
+            cleanUpDelImages(); // Clean again before final payout
             hideColor();
             const result = game.finalize(cost, 1);
             updateBank(result);
@@ -158,7 +164,6 @@ function handleStep() {
             break;
     }
 }
-
 
 function reset() {
     step = 0;
