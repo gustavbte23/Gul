@@ -1,5 +1,5 @@
-import { getBank, updateBank, canAfford, renderBank } from './bank.js';
-import { showColor, hideColor, startSpinningReels } from './visionary.js';
+import { getBank, updateBank, canAfford, renderBank, renderMode, renderCounter} from './bank.js';
+import { showColor, hideColor, startSpinningReels, showJackpot, hideJackpot} from './visionary.js';
 
 class PrivatePureLoveTrain {
     constructor() {
@@ -8,16 +8,26 @@ class PrivatePureLoveTrain {
         this.num3 = 0;
         this.pachinko = 0;
         this.roll = 0;
-        this.probability = 0;
         this.faster = 0;
         this.jackpot = 0;
         this.count = 0;
         this.spin = 0;
+        this.pin = 0;
+        this.mang = 0;
+    }
+
+    updateMode() {
+        if (probability === 0 || probability === null) {
+            renderMode('Normal');
+        } else if (probability === 1) {
+            renderMode('Increased Probability');
+        } else {
+            renderMode('Faster Spins');
+        }
     }
 
     initializePachinko() {
-        this.faster = 0;
-        this.probability = 0;
+        if(probability === 0){
         this.jackpot = 0;
         this.count = 0;
         this.spin = Math.floor(Math.random() * 20) + 1;
@@ -42,10 +52,44 @@ class PrivatePureLoveTrain {
                 break;
             case 4:
                 this.jackpot = 1;
+                showJackpot ();
                 step = 1;
                 console.log("Rainbow");
                 break;
         }
+    } else {
+        probability = 0;
+        this.jackpot = 0;
+        this.count = 0;
+        this.spin = Math.floor(Math.random() * 20) + 1;
+
+        if (this.spin === 20) this.pachinko = 4;
+        else if (this.spin > 15) this.pachinko = 4;
+        else if (this.spin > 10) this.pachinko = 4;
+        else this.pachinko = 4;
+
+        switch (this.pachinko) {
+            case 1:
+                this.roll = 2;
+                console.log("Green");
+                break;
+            case 2:
+                this.roll = 4;
+                console.log("Red");
+                break;
+            case 3:
+                this.roll = 6;
+                console.log("Gold");
+                break;
+            case 4:
+                this.jackpot = 1;
+                showJackpot ();
+                step = 1;
+                console.log("Rainbow");
+                break;
+        }
+
+    }
     }
 
     getColor() {
@@ -59,39 +103,46 @@ class PrivatePureLoveTrain {
     }
 
     doSpin() {
-        if (this.jackpot !== 1) {
-            this.num1 = Math.floor(Math.random() * 7) + 1;
-            this.num2 = Math.floor(Math.random() * 7) + 1;
-            this.num3 = Math.floor(Math.random() * 7) + 1;
-
-            console.log(`${this.num1} ${this.num2} ${this.num3}`);
-
-            if (this.num1 === this.num2 && this.num1 === this.num3) {
-                this.jackpot = 1;
-            }
+        this.num1 = Math.floor(Math.random() * 7) + 1;
+        this.num2 = Math.floor(Math.random() * 7) + 1;
+        this.num3 = Math.floor(Math.random() * 7) + 1;
+        console.log(`${this.num1} ${this.num2} ${this.num3}`);
+        if (this.num1 === this.num2 && this.num1 === this.num3) {
+            this.jackpot = 1;
+            showJackpot();
         }
     }
 
-    finalize(cost, plinko) {
-        if (this.jackpot === 1) {
-            cost = cost * plinko;
-            console.log(`Jackpot +${cost} $`);
-
-            if ([2, 4, 6].includes(this.num1)) this.probability = 1;
-            if ([1, 3, 5].includes(this.num1)) this.faster = 1;
-            if (this.num1 === 7) this.probability = 2;
-        } else {
-            cost = cost * -1;
-            console.log(`No Jackpot. -${cost} $`);
-        }
-        return cost;
+    doCounter() {
+    this.mang++;
+    this.pin = this.roll - this.mang;
+    renderCounter(this.pin);
     }
+
+
+     finalize(cost, plinko) {
+    if (this.jackpot === 1) {
+        cost = cost * plinko;
+        console.log(`Jackpot +${cost} $`);
+
+        if ([2, 4, 6].includes(this.num1)) probability = 1;
+        if ([1, 3, 5].includes(this.num1)) this.faster = 1;
+        if (this.num1 === 7) probability = 2;
+    } else {
+        cost = cost * -1;
+        console.log(`No Jackpot. -${cost} $`);
+    }
+    renderBank();
+    this.updateMode();
+    return cost;
+}
 }
 
 let game = null;
 let cost = 0;
 let step = 0;
 let canPress = true;
+let probability = 0;
 
 function cleanUpDelImages() {
     const oldImages = document.querySelectorAll('.del');
@@ -122,7 +173,6 @@ function handleStep() {
                 console.log("You can't afford this bet.");
                 return;
             }
-
             game = new PrivatePureLoveTrain();
             game.initializePachinko();
             showColor(game.getColor());
@@ -131,9 +181,10 @@ function handleStep() {
             break;
 
         case 1:
-            cleanUpDelImages(); // Clean up reel images before spinning
+            cleanUpDelImages();
             hideColor();
             game.doSpin();
+            game.doCounter();
             startSpinningReels(game.num1, game.num2, game.num3);
             startCooldown(6500);
 
@@ -153,8 +204,10 @@ function handleStep() {
             break;
 
         case 2:
-            cleanUpDelImages(); // Clean again before final payout
+            renderCounter(0);
+            cleanUpDelImages();
             hideColor();
+            hideJackpot();
             const result = game.finalize(cost, 1);
             updateBank(result);
             renderBank();

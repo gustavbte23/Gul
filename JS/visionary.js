@@ -18,6 +18,28 @@ export function hideColor() {
     if (existing) existing.remove();
 }
 
+export function showJackpot() {
+    let jackpotDisplay = document.createElement("p");
+    jackpotDisplay.id = "jackpotFlash";
+    jackpotDisplay.style.position = "absolute";
+    jackpotDisplay.style.top = "40vh";
+    jackpotDisplay.style.left = "35vw";
+    jackpotDisplay.style.width = "30vw";
+    jackpotDisplay.style.zIndex = "999";
+    jackpotDisplay.style.color = "white";
+    jackpotDisplay.style.textAlign = "center";
+    jackpotDisplay.style.fontSize = "5vw";
+    jackpotDisplay.style.webkitTextStroke = "2px black";
+    jackpotDisplay.style.fontFamily = "'Press Start 2P', serif";
+    jackpotDisplay.innerText = "JACKPOT";
+    document.body.appendChild(jackpotDisplay);
+}
+
+export function hideJackpot() {
+    const existing = document.getElementById("jackpotFlash");
+    if (existing) existing.remove();
+}
+
 export function startSpinningReels(num1, num2, num3) {
     const reels = [
         document.getElementById("Slide1"),
