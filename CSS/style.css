@@ -25,6 +25,8 @@ div{
     opacity: 0.33;
     width: 100vw;
     height: 100vh;
+    z-index: 1000;
+    pointer-events: none;
 }
 
 #Totl{
@@ -116,3 +118,24 @@ p{
     from { opacity: 0; transform: scale(0.8); }
     to { opacity: 1; transform: scale(1); }
 }
+
+.mobile-button {
+    display: none;
+    position: fixed;
+    bottom: 10vh;
+    left: 80%;
+    transform: translateX(-50%);
+    padding: 1.5vh 3vw;
+    font-size: 2vw;
+    color: white;
+    background-color: #333;
+    border: 2px solid white;
+    border-radius: 5px;
+    font-family: 'Press Start 2P', serif;
+  }
+
+  @media screen and (max-width: 700px) {
+    .mobile-button {
+      display: block;
+    }
+  }

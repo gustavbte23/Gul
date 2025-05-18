@@ -234,3 +234,11 @@ function startCooldown(ms) {
 document.addEventListener("DOMContentLoaded", () => {
     renderBank();
 });
+
+const mobileButton = document.getElementById("mobileEnter");
+  if (mobileButton) {
+    mobileButton.addEventListener("click", () => {
+      const enterEvent = new KeyboardEvent("keydown", { key: "Enter" });
+      document.dispatchEvent(enterEvent);
+    });
+  }
