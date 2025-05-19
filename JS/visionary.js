@@ -3,7 +3,7 @@ let colorDisplay = null;
 export function showColor(color) {
     hideColor();
     colorDisplay = document.createElement("img");
-    colorDisplay.src = `Images/Colour/${color}.png`;
+    colorDisplay.src = `Images/Colour/${color}.webp`;
     colorDisplay.id = "colorFlash";
     colorDisplay.style.position = "absolute";
     colorDisplay.style.top = "10vh";
