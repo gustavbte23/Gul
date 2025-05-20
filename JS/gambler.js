@@ -52,7 +52,7 @@ class PrivatePureLoveTrain {
                 break;
             case 4:
                 this.jackpot = 1;
-                showJackpot ();
+                showJackpot (0);
                 step = 1;
                 console.log("Rainbow");
                 break;
@@ -109,7 +109,7 @@ class PrivatePureLoveTrain {
         console.log(`${this.num1} ${this.num2} ${this.num3}`);
         if (this.num1 === this.num2 && this.num1 === this.num3) {
             this.jackpot = 1;
-            showJackpot();
+            showJackpot(6500);
         }
     }
 

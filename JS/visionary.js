@@ -18,7 +18,7 @@ export function hideColor() {
     if (existing) existing.remove();
 }
 
-export function showJackpot() {
+export function showJackpot(ms) {
     setTimeout(() => {
     let jackpotDisplay = document.createElement("p");
     jackpotDisplay.id = "jackpotFlash";
@@ -34,7 +34,7 @@ export function showJackpot() {
     jackpotDisplay.style.fontFamily = "'Press Start 2P', serif";
     jackpotDisplay.innerText = "JACKPOT";
     document.body.appendChild(jackpotDisplay);
-    }, 6000);
+    }, ms);
 }
 
 export function hideJackpot() {
